@@ -1,14 +1,8 @@
-// src/components/VideoPlayerModal.tsx
 import React from 'react';
 
-// Define the props for VideoPlayerModal component
-interface VideoPlayerModalProps {
-    youtubeUrl: string;
-    onClose: () => void;
-}
-
-const VideoPlayerModal: React.FC<VideoPlayerModalProps> = ({ youtubeUrl, onClose }) => {
-    if (!youtubeUrl) return null; // Don't render modal if no URL
+// Video Player Modal Component
+const VideoPlayerModal = ({ youtubeUrl, onClose }) => {
+    if (!youtubeUrl) return null;
 
     return (
         <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-50 p-4">

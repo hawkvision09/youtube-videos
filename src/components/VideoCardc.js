@@ -1,33 +1,15 @@
-// src/components/VideoCard.tsx
 import React from 'react';
 
-// Define the type for a video object
-interface Video {
-    id: string;
-    title: string;
-    description: string;
-    thumbnail: string;
-    youtubeUrl: string;
-    category: string;
-    isFeatured: boolean;
-}
-
-// Define the props for VideoCard component
-interface VideoCardProps {
-    video: Video;
-    onPlay: (youtubeUrl: string) => void;
-    isCategoryURL: boolean;
-}
-
-const VideoCard: React.FC<VideoCardProps> = ({ video, onPlay, isCategoryURL }) => {
+// Video Card Component
+const VideoCard = ({ video, onPlay, isCategoryGrid }) => {
     return (
-        <div className="relative flex-shrink-0 w-48 md:w-64 bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 group" style={isCategoryURL ? { width: "-webkit-fill-available" } : {}} >
+        <div className={`relative flex-shrink-0 bg-gray-800 rounded-lg overflow-hidden shadow-lg transition-transform duration-300 ease-in-out hover:scale-105 group ${isCategoryGrid ? 'w-full' : 'w-48 md:w-64'}`}>
             <img
                 src={video.thumbnail}
                 alt={video.title}
                 className="w-full h-32 md:h-40 object-cover"
-                onError={(e: React.SyntheticEvent<HTMLImageElement, Event>) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://placehold.co/320x180/2d3748/e2e8f0?text=No+Image'; }}
-            />  
+                onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://placehold.co/320x180/2d3748/e2e8f0?text=No+Image'; }}
+            />
             <div className="p-3">
                 <h4 className="text-md md:text-lg font-semibold truncate">{video.title}</h4>
                 <p className="text-gray-400 text-sm truncate">{video.description}</p>
