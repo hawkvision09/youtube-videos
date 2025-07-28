@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useNavigate } from 'react-router-dom';
 
 // Import all sub-components
@@ -7,27 +7,18 @@ import VideoPlayerModal from './components/VideoPlayerModal';
 import CategoryModal from './components/CategoryModal';
 import HomePageContent from './components/HomePageContent';
 import CategoryPageContent from './components/CategoryPageContent';
+import LoadingAnimation from './components/LoadingAnimation'; // Import the new component
 
 // --- GLOBAL CONSTANTS (Replace with your actual API Key and Channel ID) ---
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY || "YOUR_YOUTUBE_API_KEY"; // REPLACE WITH YOUR ACTUAL API KEY
 const YOUR_CHANNEL_ID = process.env.REACT_APP_YOUTUBE_CHANNEL_ID || "YOUR_YOUTUBE_CHANNEL_ID"; // REPLACE WITH YOUR ACTUAL CHANNEL ID
-const FEATURED_KEYWORD = '[FEATURED]';
+const FEATURED_KEYWORD = '[FEATURED]'; // Keyword to mark videos as featured
 
 // Construct the base URL for the YouTube channel
 const YOUTUBE_CHANNEL_BASE_URL = `https://www.youtube.com/channel/${YOUR_CHANNEL_ID}`;
 
-// --- HELPER FUNCTIONS ---
-const createSlug = (name) => {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim();
-};
-
 // --- MAIN APP COMPONENT ---
-const App = () => { // This is the App component that will be rendered by index.js
+const App = () => {
   // Global states
   const [videos, setVideos] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -38,28 +29,26 @@ const App = () => { // This is the App component that will be rendered by index.
   const [playingVideoUrl, setPlayingVideoUrl] = useState('');
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
-  const [minimumLoadingTimePassed, setMinimumLoadingTimePassed] = useState(false); // New state for min loading time
+  const [minimumLoadingTimePassed, setMinimumLoadingTimePassed] = useState(false);
 
   const navigate = useNavigate();
-  const startTime = Date.now(); // Capture start time of fetch
 
   // Fetch all YouTube data (playlists and videos)
-  const fetchYouTubeData = useCallback(async () => {
+  const fetchYouTubeData = useCallback(async (startTime) => {
     console.log("Fetching YouTube data...");
     setLoading(true);
     setError(null);
-    setMinimumLoadingTimePassed(false); // Reset on new fetch
+    setMinimumLoadingTimePassed(false);
 
-    // Start minimum loading timer
     const minLoadTimer = setTimeout(() => {
       setMinimumLoadingTimePassed(true);
-    }, 3000); // 3 seconds minimum display time
+    }, 3000);
 
     try {
       if (!YOUTUBE_API_KEY || !YOUR_CHANNEL_ID || YOUTUBE_API_KEY === 'YOUR_YOUTUBE_API_KEY' || YOUR_CHANNEL_ID === 'YOUR_YOUTUBE_CHANNEL_ID') {
         setError("API Key or Channel ID environment variables are not set correctly in App.js global constants.");
         setLoading(false);
-        clearTimeout(minLoadTimer); // Clear timer if error occurs immediately
+        clearTimeout(minLoadTimer);
         return;
       }
 
@@ -79,22 +68,22 @@ const App = () => { // This is the App component that will be rendered by index.
       // Add a default "All Videos" category using the uploads playlist
       const uploadsPlaylistId = `UU${YOUR_CHANNEL_ID.substring(2)}`;
       const allVideosResponse = await fetch(
-        `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${uploadsPlaylistId}&key=${YOUTUBE_API_KEY}`
+          `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=${uploadsPlaylistId}&key=${YOUTUBE_API_KEY}`
       );
       if (allVideosResponse.ok) {
-        const allVideosData = await allVideosResponse.json();
-        allVideosData.items.forEach((item) => {
-          const isFeaturedByKeyword = item.snippet.description?.toLowerCase().includes(FEATURED_KEYWORD.toLowerCase()) || false;
-          allFetchedVideos.push({
-            id: item.snippet.resourceId.videoId,
-            title: item.snippet.title,
-            description: item.snippet.description,
-            thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url || 'https://placehold.co/320x180/1a202c/e2e8f0?text=No+Image',
-            youtubeUrl: `https://www.youtube.com/embed/${item.snippet.resourceId.videoId}`,
-            category: 'All Videos',
-            isFeatured: isFeaturedByKeyword,
+          const allVideosData = await allVideosResponse.json();
+          allVideosData.items.forEach((item) => {
+              const isFeaturedByKeyword = item.snippet.description?.toLowerCase().includes(FEATURED_KEYWORD.toLowerCase()) || false;
+              allFetchedVideos.push({
+                  id: item.snippet.resourceId.videoId,
+                  title: item.snippet.title,
+                  description: item.snippet.description,
+                  thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url || 'https://placehold.co/320x180/1a202c/e2e8f0?text=No+Image',
+                  youtubeUrl: `https://www.youtube.com/embed/${item.snippet.resourceId.videoId}`,
+                  category: 'All Videos',
+                  isFeatured: isFeaturedByKeyword,
+              });
           });
-        });
       }
 
       // 2. For each Playlist, Fetch its Videos (Playlist Items)
@@ -132,15 +121,15 @@ const App = () => { // This is the App component that will be rendered by index.
 
       const uniqueVideosMap = new Map();
       allFetchedVideos.forEach(video => {
-        if (uniqueVideosMap.has(video.id)) {
-          const existingVideo = uniqueVideosMap.get(video.id);
-          uniqueVideosMap.set(video.id, {
-            ...existingVideo,
-            isFeatured: existingVideo.isFeatured || video.isFeatured
-          });
-        } else {
-          uniqueVideosMap.set(video.id, video);
-        }
+          if (uniqueVideosMap.has(video.id)) {
+              const existingVideo = uniqueVideosMap.get(video.id);
+              uniqueVideosMap.set(video.id, {
+                  ...existingVideo,
+                  isFeatured: existingVideo.isFeatured || video.isFeatured
+              });
+          } else {
+              uniqueVideosMap.set(video.id, video);
+          }
       });
       const uniqueVideos = Array.from(uniqueVideosMap.values());
       setVideos(uniqueVideos);
@@ -149,24 +138,20 @@ const App = () => { // This is the App component that will be rendered by index.
       console.error("Error fetching YouTube data:", e);
       setError(`Failed to load videos: ${e.message}. Please check your API key and channel ID in your .env.local file or deployment environment variables.`);
     } finally {
-      // Only set loading to false after both data is fetched AND min time passed
-      // This ensures the animation is shown for at least 3 seconds
-      clearTimeout(minLoadTimer); // Clear the initial timer
-      if (!minimumLoadingTimePassed) {
-        // If data loaded before 3 seconds, wait for the timer to pass
-        setTimeout(() => setLoading(false), 3000 - (Date.now() - startTime)); // Adjust delay if needed
+      clearTimeout(minLoadTimer);
+      const elapsedTime = Date.now() - startTime;
+      if (elapsedTime < 3000) {
+        setTimeout(() => setLoading(false), 3000 - elapsedTime);
       } else {
-        // If 3 seconds already passed, set loading to false immediately
         setLoading(false);
       }
     }
   }, []);
 
-  // Use a separate useEffect for the initial fetch to correctly manage dependencies
   useEffect(() => {
-    fetchYouTubeData(startTime); // Pass start time to useCallback
+    const startTime = Date.now();
+    fetchYouTubeData(startTime);
   }, [fetchYouTubeData]);
-
 
   // Auto-slide logic for featured videos
   const featuredVideos = videos.filter(video => video.isFeatured);
@@ -209,14 +194,9 @@ const App = () => { // This is the App component that will be rendered by index.
     <div className="min-h-screen bg-gray-900 text-white font-inter antialiased">
       <Header onOpenPlaylists={() => setShowCategoryModal(true)} onGoHome={handleGoHome} />
 
-      {showLoadingAnimation && (
-        <div className="fixed inset-0 flex flex-col items-center justify-center bg-gray-900 z-50">
-          <img src="https://placehold.co/200x200/ff0000/ffffff?text=Loading..." alt="Loading Animation" className="w-48 h-48 animate-pulse" />
-          <p className="text-xl text-gray-400 mt-4">Loading your music experience...</p>
-        </div>
-      )}
+      {showLoadingAnimation && <LoadingAnimation />}
 
-      {error && !showLoadingAnimation && ( // Only show error if not loading animation
+      {error && !showLoadingAnimation && (
         <div className="min-h-screen flex flex-col items-center justify-center text-xl text-red-500 p-4 text-center">
           Error: {error}
           <p className="text-sm text-gray-400 mt-2">Ensure API Key and Channel ID are correct.</p>

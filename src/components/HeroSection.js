@@ -16,7 +16,7 @@ const HeroSection = ({ featuredVideos, currentSlideIndex, onPlayVideo, onGoToSli
         <div className="relative h-[60vh] md:h-[80vh] overflow-hidden flex items-center justify-center">
             <img
                 src={currentVideo.thumbnail}
-                // alt={currentVideo.title}
+                alt={currentVideo.title}
                 className="absolute inset-0 w-full h-full object-cover filter blur-lg brightness-50 transition-opacity duration-1000 ease-in-out"
                 key={`bg-${currentVideo.id}`}
                 onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://placehold.co/1920x1080/1a202c/e2e8f0?text=Vivid+Background'; }}
@@ -27,7 +27,7 @@ const HeroSection = ({ featuredVideos, currentSlideIndex, onPlayVideo, onGoToSli
                 <div className="flex-shrink-0 w-full md:w-1/2 lg:w-2/5 aspect-video rounded-xl overflow-hidden shadow-2xl transform transition-transform duration-500 ease-out hover:scale-105">
                     <img
                         src={currentVideo.thumbnail}
-                        // alt={currentVideo.title}
+                        alt={currentVideo.title}
                         className="w-full h-full object-cover"
                         key={`thumb-${currentVideo.id}`}
                         onError={(e) => { e.currentTarget.onerror = null; e.currentTarget.src = 'https://placehold.co/640x360/2d3748/e2e8f0?text=Video+Frame'; }}

@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import App from './App'; // Import your main App component
-import { BrowserRouter } from 'react-router-dom';
-
+import { BrowserRouter } from 'react-router-dom'; // Import BrowserRouter
 
 // Create a root and render your App component into it
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <BrowserRouter basename="/aor">
+    <BrowserRouter> {/* Wrap App with BrowserRouter */}
       <App />
     </BrowserRouter>
   </React.StrictMode>
