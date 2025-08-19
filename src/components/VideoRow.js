@@ -8,8 +8,8 @@ const VideoRow = ({ category, videos, onPlayVideo }) => {
     const [showArrows, setShowArrows] = useState(false);
 
     // --- Declare and initialize filteredVideos BEFORE any conditional returns ---
-    const filteredVideos = videos.filter(video =>
-        video && typeof video.category === 'string' && video.category === category
+    const filteredVideos = videos.filter(video => 
+        video && Array.isArray(video.categories) && video.categories.includes(category)
     );
 
     useEffect(() => {

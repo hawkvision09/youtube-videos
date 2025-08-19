@@ -1,8 +1,9 @@
 import HeroSection from './HeroSection';
 import VideoRow from './VideoRow';
+import PlaylistSlider from './PlaylistSlider';
 
 // HomePageContent Component
-const HomePageContent = ({ videos, allCategories, onPlayVideo, currentSlideIndex, onGoToSlide, onGoToChannel }) => {
+const HomePageContent = ({ videos, allPlaylists, allCategories, onPlayVideo, currentSlideIndex, onGoToSlide, onGoToChannel }) => {
     const featuredVideos = videos.filter(video => video.isFeatured);
 
     return (
@@ -15,6 +16,7 @@ const HomePageContent = ({ videos, allCategories, onPlayVideo, currentSlideIndex
                 onGoToChannel={onGoToChannel} // Pass onGoToChannel to HeroSection
             />
             <main className="relative z-20 -mt-20 md:-mt-32 px-6 pb-10 py-20 md:py-0">
+                <PlaylistSlider playlists={allPlaylists} />
                 {allCategories.map(category => (
                     <VideoRow
                         key={category}

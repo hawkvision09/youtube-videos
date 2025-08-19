@@ -8,6 +8,7 @@ import CategoryModal from './components/CategoryModal';
 import HomePageContent from './components/HomePageContent';
 import CategoryPageContent from './components/CategoryPageContent';
 import LoadingAnimation from './components/LoadingAnimation'; // Import the new component
+import { createSlug } from './utils/slug';
 
 // --- GLOBAL CONSTANTS (Replace with your actual API Key and Channel ID) ---
 const YOUTUBE_API_KEY = process.env.REACT_APP_YOUTUBE_API_KEY || "YOUR_YOUTUBE_API_KEY"; // REPLACE WITH YOUR ACTUAL API KEY
@@ -80,7 +81,7 @@ const App = () => {
                   description: item.snippet.description,
                   thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url || 'https://placehold.co/320x180/1a202c/e2e8f0?text=No+Image',
                   youtubeUrl: `https://www.youtube.com/embed/${item.snippet.resourceId.videoId}`,
-                  category: 'All Videos',
+                  categories: ['All Videos'],
                   isFeatured: isFeaturedByKeyword,
               });
           });
@@ -113,7 +114,7 @@ const App = () => {
             description: item.snippet.description,
             thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url || 'https://placehold.co/320x180/1a202c/e2e8f0?text=No+Image',
             youtubeUrl: `https://www.youtube.com/embed/${item.snippet.resourceId.videoId}`,
-            category: playlistTitle,
+            categories: [playlistTitle],
             isFeatured: isFeaturedByKeyword,
           });
         });
@@ -123,8 +124,10 @@ const App = () => {
       allFetchedVideos.forEach(video => {
           if (uniqueVideosMap.has(video.id)) {
               const existingVideo = uniqueVideosMap.get(video.id);
+              const newCategories = [...new Set([...existingVideo.categories, ...video.categories])];
               uniqueVideosMap.set(video.id, {
                   ...existingVideo,
+                  categories: newCategories,
                   isFeatured: existingVideo.isFeatured || video.isFeatured
               });
           } else {
@@ -176,9 +179,10 @@ const App = () => {
     setShowVideoPlayer(false);
   };
 
-  const allCategories = [...new Set(videos.map(video => video.category).filter(Boolean))];
+  const allCategories = [...new Set(videos.flatMap(video => video.categories).filter(Boolean))];
 
-  const handleSelectCategory = (slug) => {
+  const handleSelectCategory = (category) => {
+    const slug = createSlug(category);
     navigate(`/playlist/${slug}`);
     setShowCategoryModal(false);
   };
@@ -208,6 +212,7 @@ const App = () => {
           <Route path="/" element={
             <HomePageContent
               videos={videos}
+              allPlaylists={allPlaylists}
               allCategories={allCategories}
               onPlayVideo={playVideo}
               currentSlideIndex={currentSlideIndex}

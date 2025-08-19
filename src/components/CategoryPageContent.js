@@ -1,16 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'; // Import useParams
 import VideoCard from './VideoCardc';
-
-// Helper function (duplicated for self-containment in this component's file)
-const createSlug = (name) => {
-    return name
-        .toLowerCase()
-        .replace(/[^a-z0-9\s-]/g, '')
-        .replace(/\s+/g, '-')
-        .replace(/-+/g, '-')
-        .trim();
-};
+import { createSlug } from '../utils/slug';
 
 // CategoryPageContent Component
 const CategoryPageContent = ({
@@ -32,28 +23,15 @@ const CategoryPageContent = ({
         // This component now relies on allChannelVideos and allPlaylists being passed from App.js
         // It does not need to re-fetch API data itself.
 
-        console.log("Filtering videos for CategoryPageContent...");
-        console.log("categorySlug from URL (useParams):", categorySlug);
-        console.log("allChannelVideos (before filter):", allChannelVideos);
-        console.log("allPlaylists (before thumbnail/description/ID search):", allPlaylists);
-
         if (allChannelVideos.length > 0) {
             const filtered = allChannelVideos.filter(video => {
-                const videoCategory = video && typeof video.category === 'string' ? video.category : '';
-                const videoCategorySlug = createSlug(videoCategory);
-                console.log(`--- Filtering Comparison (CategoryPageContent) ---`);
-                console.log(`Received Slug: "${categorySlug}"`);
-                console.log(`Video Title: "${video.title}"`);
-                console.log(`Video Category (Original): "${videoCategory}"`);
-                console.log(`Video Category (Slugified): "${videoCategorySlug}"`);
-                const isMatch = videoCategorySlug === categorySlug;
-                console.log(`Match: ${isMatch}`);
-                return isMatch;
+                if (!video || !Array.isArray(video.categories)) {
+                    return false;
+                }
+                // Check if any of the video's categories match the slug from the URL
+                return video.categories.some(videoCategory => createSlug(videoCategory) === categorySlug);
             });
-            console.log("Filtered videos (after filter - CategoryPageContent):", filtered);
             setVideos(filtered);
-        } else {
-            console.log("allChannelVideos is empty in CategoryPageContent, cannot filter yet.");
         }
 
         if (allPlaylists.length > 0) {
