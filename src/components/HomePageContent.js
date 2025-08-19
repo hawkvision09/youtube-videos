@@ -1,3 +1,4 @@
+import { Helmet } from 'react-helmet-async';
 import HeroSection from './HeroSection';
 import VideoRow from './VideoRow';
 import PlaylistSlider from './PlaylistSlider';
@@ -8,6 +9,13 @@ const HomePageContent = ({ videos, allPlaylists, allCategories, onPlayVideo, cur
 
     return (
         <>
+            <Helmet>
+                <title>Home - My YouTube Channel</title>
+                <meta name="description" content="Welcome to my awesome YouTube channel. Browse through my featured videos and playlists." />
+                <meta property="og:title" content="Home - My YouTube Channel" />
+                <meta property="og:description" content="Welcome to my awesome YouTube channel. Browse through my featured videos and playlists." />
+                <meta property="og:type" content="website" />
+            </Helmet>
             <HeroSection
                 featuredVideos={featuredVideos}
                 currentSlideIndex={currentSlideIndex}

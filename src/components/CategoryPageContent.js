@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'; // Import useParams
+import { Helmet } from 'react-helmet-async';
 import VideoCard from './VideoCardc';
 import { createSlug } from '../utils/slug';
 
@@ -58,6 +59,13 @@ const CategoryPageContent = ({
 
     return (
         <div className="min-h-screen bg-gray-900 text-white font-inter pt-20 px-6">
+            <Helmet>
+                <title>{`${categoryNameForDisplay} - My YouTube Channel`}</title>
+                <meta name="description" content={`Browse videos from the ${categoryNameForDisplay} playlist.`} />
+                <meta property="og:title" content={`${categoryNameForDisplay} - My YouTube Channel`} />
+                <meta property="og:description" content={`Browse videos from the ${categoryNameForDisplay} playlist.`} />
+                <meta property="og:type" content="website" />
+            </Helmet>
             <div className="flex max-w-4xl flex-col md:flex-row items-center md:items-start space-y-6 md:space-y-0 md:space-x-8 py-20">
                 {currentPlaylistThumbnail && (
                     <img
