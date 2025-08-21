@@ -36,7 +36,7 @@ const App = () => {
 
   // Fetch all YouTube data (playlists and videos)
   const fetchYouTubeData = useCallback(async (startTime) => {
-    console.log("Fetching YouTube data...");
+    // console.log("Fetching YouTube data...");
     setLoading(true);
     setError(null);
     setMinimumLoadingTimePassed(false);

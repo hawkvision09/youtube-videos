@@ -49,7 +49,7 @@ const VideoRow = ({ category, videos, onPlayVideo }) => {
         }
     };
 
-    console.log(`VideoRow: Rendering for category "${category}" with ${filteredVideos.length} videos.`, filteredVideos);
+    // console.log(`VideoRow: Rendering for category "${category}" with ${filteredVideos.length} videos.`, filteredVideos);
 
     return (
         <section className="mb-8 relative group">
